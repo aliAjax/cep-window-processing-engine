@@ -1,0 +1,26 @@
+package watermark
+
+import (
+	"fmt"
+	"time"
+)
+
+type Coordinator struct {
+	Tracker *Tracker
+	Policy  Policy
+	Barrier *Barrier
+}
+
+func (c *Coordinator) Advance(partition int, next time.Time) (time.Time, error) {
+	if c.Tracker == nil || c.Barrier == nil {
+		return time.Time{}, fmt.Errorf("watermark coordinator is not initialized")
+	}
+	current := c.Tracker.Snapshot()[partition]
+	if !c.Policy.Accept(current, next) {
+		return c.Barrier.Current(), fmt.Errorf("watermark update rejected")
+	}
+	if err := c.Tracker.Advance(partition, next); err != nil {
+		return c.Barrier.Current(), err
+	}
+	return c.Barrier.Publish(next), nil
+}
