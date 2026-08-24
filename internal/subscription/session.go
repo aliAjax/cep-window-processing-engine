@@ -15,6 +15,9 @@ type SessionStore struct {
 func (s *SessionStore) Open(session Session) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if s.sessions == nil {
+		s.sessions = map[string]Session{}
+	}
 	s.sessions[session.ID] = session
 }
 

@@ -15,6 +15,9 @@ type Snapshotter struct {
 func (s *Snapshotter) Capture(group string, snapshot Snapshot) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if s.snapshots == nil {
+		s.snapshots = map[string]Snapshot{}
+	}
 	s.snapshots[group] = snapshot
 }
 

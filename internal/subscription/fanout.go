@@ -15,6 +15,9 @@ type Fanout struct {
 func (f *Fanout) Enqueue(group string, notification Notification) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
+	if f.queues == nil {
+		f.queues = map[string][]Notification{}
+	}
 	f.queues[group] = append(f.queues[group], notification)
 }
 
