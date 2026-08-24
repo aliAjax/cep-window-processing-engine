@@ -1,0 +1,10 @@
+syntax = "proto3";
+package cep.engine.v1;
+option go_package = "github.com/example/cep-window-engine/api/proto";
+message Event { string id = 1; string stream_id = 2; string type = 3; int64 event_time_unix_ms = 4; bytes payload_json = 5; }
+message IngestRequest { Event event = 1; }
+message Match { string id = 1; string pattern_id = 2; repeated string evidence = 3; }
+message IngestResponse { repeated Match matches = 1; }
+message CheckpointRequest { string runtime_id = 1; }
+message CheckpointResponse { string checkpoint_id = 1; }
+service Engine { rpc Ingest(IngestRequest) returns (IngestResponse); rpc SaveCheckpoint(CheckpointRequest) returns (CheckpointResponse); }
