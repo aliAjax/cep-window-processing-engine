@@ -14,9 +14,9 @@ func (s State) CanTransition(next State) bool {
 	allowed := map[State]map[State]bool{
 		StatePending:   {StateDeploying: true},
 		StateDeploying: {StateActive: true, StateRetrying: true, StateFailed: true},
-		StateRetrying:  {StateDeploying: true, StateFailed: true},
+		StateRetrying:  {StateDeploying: true, StateActive: true, StateFailed: true},
 		StateActive:    {StateDeploying: true},
-		StateFailed:    {StateRetrying: true},
+		StateFailed:    {StateRetrying: true, StateDeploying: true},
 	}
 	return allowed[s][next]
 }

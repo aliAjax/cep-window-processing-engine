@@ -10,7 +10,7 @@ func (q Query) Runnable() []string {
 	states := q.Service.Snapshot()
 	out := make([]string, 0)
 	for id, state := range states {
-		if state == StateDeploying {
+		if state == StateActive {
 			out = append(out, id)
 		}
 	}

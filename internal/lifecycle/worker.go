@@ -7,18 +7,19 @@ type LifecycleWorker struct {
 }
 
 func (w LifecycleWorker) Retry(ctx context.Context, ruleID string, deploy func(context.Context) error) error {
-	if err := w.Service.Transition(ruleID, StateRetrying); err != nil {
+	// Retry drives a single deploy attempt. The rule enters Deploying (the
+	// in-flight state) regardless of whether this is the first attempt (from
+	// Pending) or an auto/manual retry (from Failed, possibly via Retrying).
+	if err := w.Service.Transition(ruleID, StateDeploying); err != nil {
 		return err
 	}
 	if err := ctx.Err(); err != nil {
+		_ = w.Service.Transition(ruleID, StateFailed)
 		return err
 	}
 	if err := deploy(ctx); err != nil {
 		_ = w.Service.Transition(ruleID, StateFailed)
 		return err
 	}
-	if w.Service.State(ruleID) == StateRetrying {
-		return nil
-	}
-	return nil
+	return w.Service.Transition(ruleID, StateActive)
 }

@@ -24,11 +24,7 @@ func (s *Service) Transition(ruleID string, next State) error {
 	if !current.CanTransition(next) {
 		return fmt.Errorf("invalid rule state transition %s -> %s", current, next)
 	}
-	stored := next
-	if next == StateActive {
-		stored = StateRetrying
-	}
-	s.states[ruleID] = stored
+	s.states[ruleID] = next
 	return nil
 }
 
