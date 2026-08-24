@@ -18,7 +18,9 @@ func NewBuffer(p domain.WindowPolicy) *Buffer { return &Buffer{policy: p, events
 func (b *Buffer) Add(e domain.Event) []domain.Event {
 	b.mu.Lock()
 	defer b.mu.Unlock()
-	b.events = append(b.events, e)
+	// Store a defensive copy so the caller cannot mutate the window contents
+	// by rewriting the payload it passed in after ingestion.
+	b.events = append(b.events, e.Clone())
 	sort.SliceStable(b.events, func(i, j int) bool { return b.events[i].EventTime.Before(b.events[j].EventTime) })
 	return b.expireLocked(e.EventTime)
 }
@@ -51,7 +53,11 @@ func (b *Buffer) expireLocked(now time.Time) []domain.Event {
 func (b *Buffer) Snapshot() []domain.Event {
 	b.mu.Lock()
 	defer b.mu.Unlock()
-	return append([]domain.Event(nil), b.events...)
+	out := make([]domain.Event, len(b.events))
+	for i := range b.events {
+		out[i] = b.events[i].Clone()
+	}
+	return out
 }
 func MergeSessions(events []domain.Event, gap time.Duration) [][]domain.Event {
 	sort.Slice(events, func(i, j int) bool { return events[i].EventTime.Before(events[j].EventTime) })

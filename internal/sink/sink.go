@@ -39,13 +39,19 @@ func (m *Memory) Send(ctx context.Context, v domain.Match) error {
 		m.Failures--
 		return errors.New("simulated sink failure")
 	}
-	m.Items = append(m.Items, v)
+	// Store an isolated copy so later mutations by the caller cannot rewrite
+	// matches that have already been delivered to this sink.
+	m.Items = append(m.Items, v.Clone())
 	return nil
 }
 func (m *Memory) List() []domain.Match {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	return append([]domain.Match(nil), m.Items...)
+	out := make([]domain.Match, len(m.Items))
+	for i := range m.Items {
+		out[i] = m.Items[i].Clone()
+	}
+	return out
 }
 
 type Webhook struct {

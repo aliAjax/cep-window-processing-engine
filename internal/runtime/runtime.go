@@ -30,6 +30,10 @@ func (e *Engine) Ingest(ev domain.Event) ([]domain.Match, error) {
 	if !e.dedup.Check(ev.Fingerprint()) {
 		return nil, nil
 	}
+	// Isolate the event from the caller's payload map before storing it in the
+	// history log and window buffers; otherwise later caller mutations would
+	// rewrite historical events and window snapshots in place.
+	ev = ev.Clone()
 	e.store.Append(ev)
 	e.mu.Lock()
 	defer e.mu.Unlock()
@@ -50,7 +54,7 @@ func (e *Engine) Ingest(ev domain.Event) ([]domain.Match, error) {
 		}
 		match := domain.Match{ID: fmt.Sprintf("m-%d", time.Now().UnixNano()), PatternID: id, TenantID: ev.TenantID, StreamID: ev.StreamID, RuleVersion: p.Version, StartedAt: ev.EventTime, CompletedAt: time.Now(), Evidence: []string{ev.ID}, Explain: domain.ExplainNode{Operator: "sequence", Result: "true", EventID: ev.ID}}
 		e.store.PutMatch(match)
-		out = append(out, match)
+		out = append(out, match.Clone())
 	}
 	return out, nil
 }
