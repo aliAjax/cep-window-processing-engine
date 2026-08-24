@@ -11,8 +11,7 @@ type Factory struct {
 
 func (f Factory) Build(enabled bool) Provider {
 	if !enabled {
-		var provider *memoryProvider
-		return provider
+		return nil
 	}
 	return f.Loader.LoadDefaults()
 }

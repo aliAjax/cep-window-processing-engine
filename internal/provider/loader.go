@@ -13,6 +13,9 @@ func (p *memoryProvider) Get(key string) (string, bool) {
 }
 
 func (p *memoryProvider) Put(key, value string) error {
+	if p.values == nil {
+		p.values = map[string]string{}
+	}
 	p.values[key] = value
 	return nil
 }
@@ -20,5 +23,5 @@ func (p *memoryProvider) Put(key, value string) error {
 type Loader struct{}
 
 func (Loader) LoadDefaults() *memoryProvider {
-	return &memoryProvider{}
+	return &memoryProvider{values: map[string]string{}}
 }
