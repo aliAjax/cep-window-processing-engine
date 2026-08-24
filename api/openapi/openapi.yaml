@@ -1,0 +1,16 @@
+openapi: 3.0.3
+info:
+  title: CEP Window Engine API
+  version: 1.0.0
+paths:
+  /healthz: {get: {responses: {"200": {description: OK}}}}
+  /readyz: {get: {responses: {"200": {description: Ready}}}}
+  /api/v1/streams: {post: {summary: Create stream, responses: {"200": {description: Created}}}}
+  /api/v1/schemas: {post: {summary: Register event schema, responses: {"200": {description: Created}}}}
+  /api/v1/patterns/validate: {post: {summary: Validate declarative pattern, responses: {"200": {description: Validation result}}}}
+  /api/v1/patterns/publish: {post: {summary: Publish compiled pattern, responses: {"200": {description: Published}}}}
+  /api/v1/events: {post: {summary: Ingest event, responses: {"200": {description: Accepted}}}}
+  /api/v1/matches: {get: {summary: List matches, responses: {"200": {description: Matches}}}}
+  /api/v1/matches/{id}/explain: {get: {summary: Explain match, parameters: [{name: id, in: path, required: true, schema: {type: string}}], responses: {"200": {description: Explain tree}}}}
+  /api/v1/runtimes/checkpoint: {post: {summary: Save state checkpoint, responses: {"200": {description: Checkpoint id}}}}
+  /api/v1/runtimes/replay: {post: {summary: Replay stream, responses: {"200": {description: Replay result}}}}
