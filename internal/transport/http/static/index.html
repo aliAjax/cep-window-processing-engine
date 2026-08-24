@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CEP Operations Console</title>
+  <style>
+    body{margin:0;font:14px system-ui;background:#f4f6f8;color:#18202a}header{height:54px;background:#17324d;color:white;display:flex;align-items:center;padding:0 24px}main{max-width:1040px;margin:24px auto;padding:0 18px}.status{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.panel{background:white;border:1px solid #dbe1e7;border-radius:6px;padding:16px}h1{font-size:18px;margin:0}h2{font-size:14px;margin:0 0 12px}strong{display:block;font-size:24px;color:#087e6b}table{width:100%;border-collapse:collapse;margin-top:18px;background:white}th,td{text-align:left;padding:11px;border-bottom:1px solid #e5e9ed}th{color:#52606d}code{color:#8c3b2a}@media(max-width:640px){.status{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header><h1>CEP Window Engine</h1></header>
+  <main>
+    <div class="status">
+      <section class="panel"><h2>Runtime</h2><strong id="runtime">Checking</strong></section>
+      <section class="panel"><h2>Event intake</h2><strong>Ready</strong></section>
+      <section class="panel"><h2>Checkpoint store</h2><strong>Connected</strong></section>
+    </div>
+    <table><thead><tr><th>Endpoint</th><th>Purpose</th></tr></thead><tbody>
+      <tr><td><code>/api/v1/events</code></td><td>Ingest partitioned events</td></tr>
+      <tr><td><code>/api/v1/matches</code></td><td>Inspect emitted matches</td></tr>
+      <tr><td><code>/api/v1/runtimes/checkpoint</code></td><td>Persist runtime state</td></tr>
+    </tbody></table>
+  </main>
+  <script>fetch('/healthz').then(r=>r.ok?r.json():Promise.reject()).then(()=>document.querySelector('#runtime').textContent='Healthy').catch(()=>document.querySelector('#runtime').textContent='Unavailable')</script>
+</body>
+</html>
