@@ -15,6 +15,10 @@ func (e QuotaServiceError) Error() string {
 	return fmt.Sprintf("apply tenant quota %q: %v", e.TenantID, e.Cause)
 }
 
+// Unwrap exposes the wrapped cause so errors.Is/errors.As traverse the error
+// chain down to ErrQuotaExceeded.
+func (e QuotaServiceError) Unwrap() error { return e.Cause }
+
 type Service struct {
 	repository Reserver
 }

@@ -22,6 +22,10 @@ func (e QuotaRepositoryError) Error() string {
 	return fmt.Sprintf("reserve quota for tenant %q: %v", e.TenantID, e.Cause)
 }
 
+// Unwrap exposes the wrapped cause so errors.Is/errors.As traverse the error
+// chain down to ErrQuotaExceeded.
+func (e QuotaRepositoryError) Unwrap() error { return e.Cause }
+
 type Repository struct {
 	mu        sync.Mutex
 	available map[string]int

@@ -18,6 +18,10 @@ func (e QuotaHandlerError) Error() string {
 	return fmt.Sprintf("submit quota reservation: %v", e.Cause)
 }
 
+// Unwrap exposes the wrapped cause so errors.Is/errors.As traverse the error
+// chain down to ErrQuotaExceeded.
+func (e QuotaHandlerError) Unwrap() error { return e.Cause }
+
 type Response struct {
 	Status   int
 	Decision Decision
