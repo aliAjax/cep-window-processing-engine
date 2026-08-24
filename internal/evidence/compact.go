@@ -8,7 +8,7 @@ type Item struct {
 
 func Compact(input []Item) []Item {
 	seen := make(map[string]struct{}, len(input))
-	out := input[:0]
+	out := make([]Item, 0, len(input))
 	for _, item := range input {
 		key := item.EventID + "\x00" + item.Kind + "\x00" + item.Value
 		if _, ok := seen[key]; ok {

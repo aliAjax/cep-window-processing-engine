@@ -14,7 +14,9 @@ func NewHistory() *History {
 func (h *History) Append(matchID string, items []Item) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	h.entries[matchID] = append(h.entries[matchID], items)
+	// Snapshot a private copy so later mutations to the caller's slice cannot
+	// rewrite a stored version.
+	h.entries[matchID] = append(h.entries[matchID], clone(items))
 }
 
 func (h *History) Versions(matchID string) [][]Item {
@@ -22,6 +24,10 @@ func (h *History) Versions(matchID string) [][]Item {
 	defer h.mu.RUnlock()
 	versions := h.entries[matchID]
 	out := make([][]Item, len(versions))
-	copy(out, versions)
+	for i, v := range versions {
+		// Copy each inner slice too; copy() alone only duplicates the outer
+		// slice and leaves the inner slices shared with the stored versions.
+		out[i] = clone(v)
+	}
 	return out
 }

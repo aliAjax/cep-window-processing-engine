@@ -7,7 +7,9 @@ type View struct {
 }
 
 func Build(matchID string, items []Item) View {
-	view := View{MatchID: matchID, Items: items, Kinds: make(map[string]int)}
+	// Take a private copy of the items so the caller's slice and any later
+	// mutation to it cannot drift the view's contents.
+	view := View{MatchID: matchID, Items: clone(items), Kinds: make(map[string]int)}
 	for _, item := range view.Items {
 		view.Kinds[item.Kind]++
 	}
