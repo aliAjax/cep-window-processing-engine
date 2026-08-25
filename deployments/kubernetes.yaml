@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: cep-window-engine}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: cep-window-engine}}
+  template:
+    metadata: {labels: {app: cep-window-engine}}
+    spec:
+      containers:
+      - name: engine
+        image: cep-window-engine:local
+        ports: [{containerPort: 8080}]
+        readinessProbe: {httpGet: {path: /readyz, port: 8080}}
+        livenessProbe: {httpGet: {path: /healthz, port: 8080}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: cep-window-engine}
+spec:
+  selector: {app: cep-window-engine}
+  ports: [{port: 8080, targetPort: 8080}]
