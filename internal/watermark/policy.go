@@ -7,7 +7,10 @@ type Policy struct {
 }
 
 func (p Policy) Accept(current, next time.Time) bool {
-	if !current.IsZero() && next.Before(current) {
+	if current.IsZero() {
+		return !next.Before(current)
+	}
+	if next.Before(current) {
 		return false
 	}
 	if p.MaximumStep > 0 && next.Sub(current) > p.MaximumStep {

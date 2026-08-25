@@ -11,15 +11,16 @@ type Barrier struct {
 }
 
 func (b *Barrier) Publish(candidate time.Time) time.Time {
-	b.mu.RLock()
-	current := b.current
-	b.mu.RUnlock()
-	if candidate.After(current) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	if candidate.After(b.current) {
 		b.current = candidate
 	}
 	return b.current
 }
 
 func (b *Barrier) Current() time.Time {
+	b.mu.RLock()
+	defer b.mu.RUnlock()
 	return b.current
 }

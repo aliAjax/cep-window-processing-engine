@@ -16,8 +16,8 @@ func NewTracker() *Tracker {
 }
 
 func (t *Tracker) Advance(partition int, next time.Time) error {
-	t.mu.RLock()
-	defer t.mu.RUnlock()
+	t.mu.Lock()
+	defer t.mu.Unlock()
 	if current := t.partitions[partition]; !current.IsZero() && next.Before(current) {
 		return fmt.Errorf("partition %d watermark regressed", partition)
 	}
@@ -28,5 +28,16 @@ func (t *Tracker) Advance(partition int, next time.Time) error {
 func (t *Tracker) Snapshot() map[int]time.Time {
 	t.mu.RLock()
 	defer t.mu.RUnlock()
-	return t.partitions
+	out := make(map[int]time.Time, len(t.partitions))
+	for id, value := range t.partitions {
+		out[id] = value
+	}
+	return out
+}
+
+// Value returns the current watermark for a single partition under the read lock.
+func (t *Tracker) Value(partition int) time.Time {
+	t.mu.RLock()
+	defer t.mu.RUnlock()
+	return t.partitions[partition]
 }
